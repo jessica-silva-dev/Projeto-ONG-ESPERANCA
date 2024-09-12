@@ -2,6 +2,26 @@
 import customtkinter as ctk
 from PIL import Image
 
+# Abrir a 2° tela e fechar a 1° ja com as configurações iniciais
+
+def segundaTela():
+    app.destroy()
+    segundaJanela = ctk.CTk()
+    segundaJanela.title("Projeto Esperança")
+    segundaJanela.geometry("800x600")
+    segundaJanela.resizable(False, False)
+    ctk.set_appearance_mode("light")
+    segundaJanela.mainloop()
+    
+def verificarLogin():
+    usuario = nomeEntry.get()
+    senha = senhaEntry.get()
+    
+    if usuario == "esperança" and senha == "esperança1234":
+        segundaTela()
+    else:
+        loginErroLabel.config(text = "Login ou senha incorretas!")
+        
 # Abrir janela
 app = ctk.CTk()
 
@@ -10,7 +30,7 @@ app.title("Projeto Esperança")
 
 # Tamanho da tela
 app.geometry("800x600")
-app.resizable(False, True)
+app.resizable(False, False)
 
 # Aparencia
 ctk.set_appearance_mode("light")
@@ -34,8 +54,11 @@ senhaLabel.place(x=300, y=390)
 senhaEntry = ctk.CTkEntry(app, placeholder_text="Senha")
 senhaEntry.place(x=365, y=390)
 
+loginErroLabel = ctk.CTkLabel(app, text="", text_color="red", font=("Georgia", 12))
+loginErroLabel.place(x=365, y=420)
+
 # Botão Entrar
-botao = ctk.CTkButton(app, text="Entrar", fg_color="orange", text_color="white", hover_color="darkorange")
+botao = ctk.CTkButton(app, text="Entrar", fg_color="orange", text_color="white", hover_color="darkorange", command=verificarLogin)
 botao.place(x=365, y=440)
 
 # Mostrar Janela
