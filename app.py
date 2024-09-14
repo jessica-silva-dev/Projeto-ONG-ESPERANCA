@@ -32,7 +32,7 @@ def segundaTela():
     nomeEntryCrianca.place(x=130, y=25)
     
     # Idade
-      = ctk.CTkLabel(abas.tab("Crianças"), text="Idade: ", font=("Georgia", 14))
+    idadeLabelCrianca = ctk.CTkLabel(abas.tab("Crianças"), text="Idade: ", font=("Georgia", 14))
     idadeLabelCrianca.place(x=300, y=25)
     
     # Entry Idade
