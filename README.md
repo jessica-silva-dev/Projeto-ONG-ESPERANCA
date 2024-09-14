@@ -19,3 +19,4 @@ Este projeto foi desenvolvido para auxiliar uma ONG no gerenciamento e cadastro 
 ## Objetivo
 
 O objetivo deste sistema é apoiar o **Projeto Esperança** na organização e distribuição de presentes e roupas para crianças em situação de vulnerabilidade durante as campanhas de adoção de final de ano.
+git branch -d nome-da-branch
