@@ -102,7 +102,7 @@ app.resizable(False, False)
 ctk.set_appearance_mode("light")
 
 # Logo
-logo = ctk.CTkImage(Image.open("imagens/logo.png"), size=(500, 350))
+logo = ctk.CTkImage(Image.open("logo.png"), size=(500, 350))
 logo_label = ctk.CTkLabel(app, image=logo, text="")  
 logo_label.place(x=150, y=20)  
 
