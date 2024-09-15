@@ -77,7 +77,7 @@ def segundaTela():
     segundaJanela.mainloop()
     
 # Função para verificar login
-def verificarLogin():
+def verificarLogin(event= None):
     usuario = nomeEntry.get()
     senha = senhaEntry.get()
     
@@ -86,7 +86,7 @@ def verificarLogin():
     if usuario == "1234" and senha == "1234":
         segundaTela()
     else:
-        loginErroLabel.config(text="Login ou senha incorretas!")
+        loginErroLabel.configure(text="Usuário ou senha inválidos!")
 
 # Abrir a janela de login
 app = ctk.CTk()
@@ -102,12 +102,12 @@ app.resizable(False, False)
 ctk.set_appearance_mode("light")
 
 # Logo
-logo = ctk.CTkImage(Image.open("imagens/logo.png"), size=(500, 350))
+logo = ctk.CTkImage(Image.open("logo.png"), size=(500, 350))
 logo_label = ctk.CTkLabel(app, image=logo, text="")  
 logo_label.place(x=150, y=20)  
 
 # Parte Nome
-nomeLabel = ctk.CTkLabel(app, text="Nome:", font=("Georgia", 16))
+nomeLabel = ctk.CTkLabel(app, text="Usuário:", font=("Georgia", 16))
 nomeLabel.place(x=300, y=350)
 
 nomeEntry = ctk.CTkEntry(app, placeholder_text="Usuário")
@@ -117,16 +117,19 @@ nomeEntry.place(x=365, y=350)
 senhaLabel = ctk.CTkLabel(app, text="Senha:", font=("Georgia", 16))
 senhaLabel.place(x=300, y=390)
 
-senhaEntry = ctk.CTkEntry(app, placeholder_text="Senha", show="*")  # Senha escondida
+senhaEntry = ctk.CTkEntry(app, placeholder_text="Senha", show="*") 
 senhaEntry.place(x=365, y=390)
 
 # Label de erro
 loginErroLabel = ctk.CTkLabel(app, text="", text_color="red", font=("Georgia", 12))
-loginErroLabel.place(x=365, y=420)
+loginErroLabel.place(x=330, y=425)
 
 # Botão Entrar
 botao = ctk.CTkButton(app, text="Entrar", fg_color="orange", text_color="white", hover_color="darkorange", command=verificarLogin)
-botao.place(x=365, y=440)
+botao.place(x=365, y=460)
+
+# Usar a tecla "Enter" como botão de login
+app.bind('<Return>', verificarLogin)
 
 # Mostrar a janela de login
 app.mainloop()
