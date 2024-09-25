@@ -201,11 +201,17 @@ def segundaJanela():
        
         cadastroCrianca.mainloop()
     
+     # Minimiza a terceira janela quando clicar para abrir a segunda janela
+    def minimizarTerceiraJanela():
+        if 'dadosPadrinhos' in globals() and    dadosPadrinhos.winfo_exists():
+            dadosPadrinhos.iconify() 
+        dadosCriancas.deiconify() 
+    
     # Icone Criança do menu lateral
     iconeCrianca = ctk.CTkImage(Image.open("icocrianca32.ico"), size=(30, 30))
     iconeCriancaLabel = ctk.CTkLabel(menuFrame, image=iconeCrianca, text="", bg_color=("#FFA500"))
     iconeCriancaLabel.place(x=15, y=50)
-   
+    
     # Icone padrinho do menu lateral
     iconePadrinho = ctk.CTkImage(Image.open("prancheta32.ico"), size=(30, 30))
     iconePadrinhoLabel = ctk.CTkLabel(menuFrame, image=iconePadrinho, text="", bg_color=("#FFA500"))
@@ -216,6 +222,7 @@ def segundaJanela():
     def terceiraJanela():
         dadosCriancas.withdraw()
         # Configurações da janela
+        global dadosPadrinhos
         dadosPadrinhos = ctk.CTkToplevel()
         dadosPadrinhos.title("Dados dos Padrinhos")
         dadosPadrinhos.geometry("900x700")
@@ -317,14 +324,16 @@ def segundaJanela():
             # Botão Salvar padrinhos 
             botaoSalvar = ctk.CTkButton(dadoscadastroPadrinho, text="Salvar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
             botaoSalvar.place(x=500, y=330)
-       
+            
             dadoscadastroPadrinho.mainloop()
+        
+         
         
         # Icone Criança do menu lateral
         iconeCrianca = ctk.CTkImage(Image.open("icocrianca32.ico"), size=(30, 30))
         iconeCriancaLabel = ctk.CTkLabel(menuFrame, image=iconeCrianca, text="", bg_color=("#FFA500"))
         iconeCriancaLabel.place(x=15, y=50)
-        iconeCriancaLabel.bind("<Button-1>", lambda e: dadosCriancas())
+        iconeCriancaLabel.bind("<Button-1>", lambda e: minimizarTerceiraJanela())
         
         # Icone padrinho do menu lateral
         iconePadrinho = ctk.CTkImage(Image.open("prancheta32.ico"), size=(30, 30))
