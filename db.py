@@ -1,27 +1,25 @@
 import mysql.connector
 from mysql.connector import Error
 
+# Conectando ao banco de dados
 def conectarDb():
-    conexao = mysql.connector.connect(
-        host='localhost',
-        database="esperanca",
-        user="dev",
-        password="Esperanca@2024"
-    )
-    return conexao
+    try:
+        conexao = mysql.connector.connect(
+            host='localhost',
+            database="esperanca",
+            user="dev",
+            password="Esperanca@2024"
+        )
+        if conexao.is_connected():
+            print("Conectado com sucesso!")
+            return conexao
+    except Error as e:
+        print(f"Erro ao se conectar: {e}")
+        return None
 
-conectar = conectarDb()
-if conectar.is_connected():
-    print("Conectado com sucesso!")
-else:
-    print("Erro ao se conectar!")
-
-def desconectarDb():
-    if conectar.is_connected():
-        conectar.close()
+# Desconectando do banco de dados
+def desconectarDb(conexao):
+    if conexao.is_connected():
+        conexao.close()
         print("Desconectado com sucesso!")
         
-
-
-
-    
