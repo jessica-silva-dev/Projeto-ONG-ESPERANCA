@@ -1,6 +1,7 @@
 import tkinter as tk
 import customtkinter as ctk
 from PIL import Image
+from db import *
 
 # janela de login
 app = ctk.CTk()
