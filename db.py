@@ -82,3 +82,19 @@ con = conectarDb()
 if con is not None:
     criarTabelas(con)
     desconectarDb(con)
+    
+# Adicionar crianças no banco de dados
+def adicionarCriancas(conexao, nome, idade, responsavel, endereco, contato, genero):
+    try:
+        cursor = conexao.cursor()
+        comandoSql = """ INSERT INTO criancas (noem, idade, responsavel, endereco, contato, genero)
+                        VALUES (%s, %s, %s, %s, %s, %s)"""
+        valores = (nome, idade, responsavel, endereco, contato, genero)
+        cursor.execute(comandoSql, valores)
+        conexao.commit()
+        print(f"Criança: {nome} adicionada com sucesso!")
+        cursor.close()
+    except Error as e:
+        print(f"Erro ao adicionar a criança: {e}")
+        
+        
