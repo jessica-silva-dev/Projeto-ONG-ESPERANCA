@@ -97,4 +97,3 @@ def adicionarCriancas(conexao, nome, idade, responsavel, endereco, contato, gene
     except Error as e:
         print(f"Erro ao adicionar a criança: {e}")
         
-        
