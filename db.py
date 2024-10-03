@@ -16,7 +16,6 @@ def conectarDb():
         if conexao.is_connected():
             print("Conectado com sucesso!")
             return conexao
-    # S
     except Error as e:
         print(f"Erro ao se conectar: {e}")
         return None
@@ -78,22 +77,29 @@ def criarTabelas(conexao):
     except Error as e:
         print(f"Erro ao criar as tabelas: {e}")
         
-con = conectarDb()
-if con is not None:
-    criarTabelas(con)
-    desconectarDb(con)
-    
 # Adicionar crianças no banco de dados
 def adicionarCriancas(conexao, nome, idade, responsavel, endereco, contato, genero):
     try:
         cursor = conexao.cursor()
-        comandoSql = """ INSERT INTO criancas (noem, idade, responsavel, endereco, contato, genero)
+        comandoSql = """ INSERT INTO criancas (nome, idade, responsavel, endereco, contato, genero)
                         VALUES (%s, %s, %s, %s, %s, %s)"""
-        valores = (nome, idade, responsavel, endereco, contato, genero)
+        valores = (nome, responsavel, idade, endereco, contato, genero)
         cursor.execute(comandoSql, valores)
         conexao.commit()
         print(f"Criança: {nome} adicionada com sucesso!")
         cursor.close()
     except Error as e:
         print(f"Erro ao adicionar a criança: {e}")
-        
+
+def adicionarPadrinhos(conexao, nome, contato, email, criancaApadrinhada):
+    try:
+        cursor = conexao.cursor()
+        comandosql = """ INSERT INTO padrinhos (nome, contato, email, criancaApadrinhada)
+                        VALUES (%s, %s, %s, %s)"""
+        valores = (nome, contato, email, criancaApadrinhada)
+        cursor.execute(comandosql, valores)
+        conexao.commit()
+        print(f"Padrinho: {nome} adicionada com sucesso!")
+        cursor.close()
+    except Error as e:
+        print(f"Erro ao adicionar o Padrinho: {e}")
