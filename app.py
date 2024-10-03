@@ -3,6 +3,19 @@ import customtkinter as ctk
 from PIL import Image
 from db import *
 
+def salvarCriancas():
+    nome = nomeEntryCrianca.get()
+    responsavel = responsavelEntryCrianca.get()
+    idade = idadeComboboxCrianca.get()
+    endereco = enderecoEntryCrianca.get()
+    contato = telefoneEntryCrianca.get()
+    genero = 'Masculino' if masculinoVar.get() else 'Feminino'
+    
+    conexao = conectarDb()
+    if conexao is not None:
+        adicionarCriancas(conexao, nome, responsavel, idade, endereco, contato, genero)
+        desconectarDb(conexao)
+
 # janela de login
 app = ctk.CTk()
 
@@ -53,6 +66,7 @@ app.bind('<Return>', verificarLogin)
 def segundaJanela():
     app.destroy()  
     # Configurações da janela
+    global dadosCriancas
     dadosCriancas = ctk.CTk()
     dadosCriancas.title("Dados das Crianças")
     dadosCriancas.geometry("900x700")
@@ -130,6 +144,7 @@ def segundaJanela():
     # Jamela de cadastro de mais crianças, ao clicar no botão cadastrar vai abrir essa tela
     def janelaCadastro():
         # Configurações da janela
+        global cadastroCrianca, nomeEntryCrianca, responsavelEntryCrianca, idadeComboboxCrianca, enderecoEntryCrianca, telefoneEntryCrianca, masculinoVar, femininoVar
         cadastroCrianca = ctk.CTk()
         cadastroCrianca.title("Cadastro das crianças")
         cadastroCrianca.geometry("600x400")
@@ -197,7 +212,7 @@ def segundaJanela():
         telefoneEntryCrianca.place(x=130, y=260)
        
         # Botão Salvar cadastro criança
-        botaoSalvar = ctk.CTkButton(cadastroCrianca, text="Salvar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+        botaoSalvar = ctk.CTkButton(cadastroCrianca, text="Salvar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=salvarCriancas)
         botaoSalvar.place(x=500, y=330)
        
         cadastroCrianca.mainloop()
