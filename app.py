@@ -15,6 +15,35 @@ def salvarCriancas():
     if conexao is not None:
         adicionarCriancas(conexao, nome, responsavel, idade, endereco, contato, genero)
         desconectarDb(conexao)
+        
+def salvarPadrinhos():
+    nome = nomeEntryPadrinho.get()
+    contato = telefoneEntryPadrinho.get()
+    email = emailEntryPadrinho.get()
+    endereco = enderecoEntryPadrinho.get()
+    
+    conexao = conectarDb()
+    if conexao is not None:
+        adicionarPadrinhos(conexao, nome, contato, email, endereco)
+        desconectarDb(conexao)
+
+def listaNomesCriancas():
+    conexao = conectarDb()
+    if conexao is None:
+        print("Erro ao conectar com o banco de dados!")
+        return []
+    
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT nome FROM criancas")
+        nomeCriancas = [row[0] for  row in cursor.fetchall()]
+        cursor.close()
+        return nomeCriancas
+    except Exception as e:
+        print("Erro ao carregar nomes das crianças: {e}")
+        return []
+    finally:
+        desconectarDb(conexao)
 
 # janela de login
 app = ctk.CTk()
@@ -274,8 +303,8 @@ def segundaJanela():
         nomeLabel.place(x=300, y=160)
         
         # Entry Buscar padrinhos
-        nomeEntryCrianca = ctk.CTkEntry(dadosPadrinhos, placeholder_text="Inserir o nome", font=("Georgia", 12), width=200)
-        nomeEntryCrianca.place(x=317, y=215)
+        nomeEntryPadrinho = ctk.CTkEntry(dadosPadrinhos, placeholder_text="Inserir o nome", font=("Georgia", 12), width=200)
+        nomeEntryPadrinho.place(x=317, y=215)
     
         # Botão buscar padrinhos
         botaoBuscar = ctk.CTkButton(dadosPadrinhos, text="Buscar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
@@ -300,6 +329,7 @@ def segundaJanela():
 
         def cadastroPadrinhos():
             # Configurações da janela
+            global dadoscadastroPadrinho, nomeEntryPadrinho, telefoneEntryPadrinho, emailEntryPadrinho, criancaEntryPadrinho, enderecoEntryPadrinho
             dadoscadastroPadrinho = ctk.CTk()
             dadoscadastroPadrinho.title("Padrinhos")
             dadoscadastroPadrinho.geometry("600x400")
@@ -331,14 +361,22 @@ def segundaJanela():
             emailEntryPadrinho = ctk.CTkEntry(dadoscadastroPadrinho, placeholder_text="Email do padrinho", font=("Georgia", 12), width=260)
             emailEntryPadrinho.place(x=165, y=210)
         
+            # Endereço padrinho
+            enderecoLabelPadrinho = ctk.CTkLabel(dadoscadastroPadrinho, text="Endereço: ", font=("Georgia", 12))
+            enderecoLabelPadrinho.place(x=20, y=270)
+            enderecoEntryPadrinho = ctk.CTkEntry(dadoscadastroPadrinho, placeholder_text="Nome do endereço", font=("Georgia", 12), width=260)
+            enderecoEntryPadrinho.place(x=165, y=270)
+
             # Criança apadrinhada
-            criancaLabelPadrinho = ctk.CTkLabel(dadoscadastroPadrinho, text="Criança Apadrinhada: ", font=("Georgia", 12))
-            criancaLabelPadrinho.place(x=20, y=270)
-            criancaEntryPadrinho = ctk.CTkEntry(dadoscadastroPadrinho, placeholder_text="Nome da criança", font=("Georgia", 12), width=260)
-            criancaEntryPadrinho.place(x=165, y=270)
-        
+            apadrinhadaLabelPadrinho = ctk.CTkLabel(dadoscadastroPadrinho, text="Criança Apadrinhada: ", font=("Georgia", 12))
+            apadrinhadaLabelPadrinho.place(x=20, y=330) 
+            listaCrianca = listaNomesCriancas()
+            apadrinhadaComboboxPadrinho = ctk.CTkComboBox(dadoscadastroPadrinho, values=listaCrianca, font=("Georgia", 12), width=260, state="normal" )
+            apadrinhadaComboboxPadrinho.set('')
+            apadrinhadaComboboxPadrinho.place(x=165, y=330)
+            
             # Botão Salvar padrinhos 
-            botaoSalvar = ctk.CTkButton(dadoscadastroPadrinho, text="Salvar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+            botaoSalvar = ctk.CTkButton(dadoscadastroPadrinho, text="Salvar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command= salvarPadrinhos)
             botaoSalvar.place(x=500, y=330)
             
             dadoscadastroPadrinho.mainloop()
