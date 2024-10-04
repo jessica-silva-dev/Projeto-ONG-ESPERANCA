@@ -91,12 +91,12 @@ def adicionarCriancas(conexao, nome, idade, responsavel, endereco, contato, gene
     except Error as e:
         print(f"Erro ao adicionar a criança: {e}")
 
-def adicionarPadrinhos(conexao, nome, contato, email, criancaApadrinhada):
+def adicionarPadrinhos(conexao, nome, telefone, email, endereco ):
     try:
         cursor = conexao.cursor()
-        comandosql = """ INSERT INTO padrinhos (nome, contato, email, criancaApadrinhada)
+        comandosql = """ INSERT INTO padrinhos (nome, telefone, email, endereco )
                         VALUES (%s, %s, %s, %s)"""
-        valores = (nome, contato, email, criancaApadrinhada)
+        valores = (nome, telefone, email, endereco)
         cursor.execute(comandosql, valores)
         conexao.commit()
         print(f"Padrinho: {nome} adicionada com sucesso!")
