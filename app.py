@@ -9,7 +9,8 @@ def salvarCriancas():
     idade = idadeComboboxCrianca.get()
     endereco = enderecoEntryCrianca.get()
     contato = telefoneEntryCrianca.get()
-    genero = 'Masculino' if masculinoVar.get() else 'Feminino'
+    genero = genero.get() 
+    
     
     conexao = conectarDb()
     if conexao is not None:
@@ -226,24 +227,18 @@ def segundaJanela():
         # Genero cadastro criança
         generoLabelCrianca = ctk.CTkLabel(cadastroCrianca, text="Sexo: ", font=("Georgia", 16))
         generoLabelCrianca.place(x=185, y=320)
-       
-        # Sexo masculino cadastro criança
-        masculinoVar = tk.BooleanVar()
-        masculinoCheckCrianca = ctk.CTkCheckBox(cadastroCrianca, text="Masculino",
-        variable=masculinoVar,
-        onvalue=True,
-        offvalue=False,
-        font=("Georgia", 12) )
-        masculinoCheckCrianca.place(x=230, y=320)
-       
-        # Sexo feminino cadastro criança
-        femininoVar = tk.BooleanVar()
-        femininoCheckCrianca = ctk.CTkCheckBox(cadastroCrianca, text="Feminino",
-        variable=femininoVar,
-        onvalue=True,
-        offvalue=False,
-        font=("Georgia", 12) )
-        femininoCheckCrianca.place(x=325, y=320)
+
+        # Variável que armazenará o valor do gênero selecionado
+        generoVar = tk.StringVar(value="Masculino")  # Valor inicial padrão
+
+        # Opção Masculino
+        masculinoRadio = ctk.CTkRadioButton(cadastroCrianca, text="Masculino", variable=generoVar, value="Masculino", font=("Georgia", 12))
+        masculinoRadio.place(x=230, y=320)
+
+        # Opção Feminino
+        femininoRadio = ctk.CTkRadioButton(cadastroCrianca, text="Feminino", variable=generoVar, value="Feminino", font=("Georgia", 12))
+        femininoRadio.place(x=325, y=320)
+
        
         # Contato cadastro criança 
         telefoneLabelCrianca = ctk.CTkLabel(cadastroCrianca, text="Contato: ", font=("Georgia", 12))
