@@ -14,19 +14,28 @@ def salvarCriancas():
     
     conexao = conectarDb()
     if conexao is not None:
-        adicionarCriancas(conexao, nome, responsavel, idade, endereco, contato, genero)
+        adicionarCriancas(conexao, nome, responsavel, endereco, contato, idade, genero)
         desconectarDb(conexao)
         
 def salvarPadrinhos():
+    
     nome = nomeEntryPadrinho.get()
     contato = telefoneEntryPadrinho.get()
     email = emailEntryPadrinho.get()
     endereco = enderecoEntryPadrinho.get()
+    criancaApadrinhada = apadrinhadaComboboxPadrinho.get()
+    
     
     conexao = conectarDb()
+    
     if conexao is not None:
-        adicionarPadrinhos(conexao, nome, contato, email, endereco)
-        desconectarDb(conexao)
+        try: 
+            idCriancaSelcionada = obterCriancaPorNome(conexao, criancaApadrinhada)
+            adicionarPadrinhos(conexao, nome, contato, email, endereco, idCriancaSelcionada)
+        except Exception as e:
+            print(f"Erro ao salvar padrinho: {e}")
+        finally:    
+            desconectarDb(conexao)
 
 def listaNomesCriancas():
     conexao = conectarDb()
@@ -45,6 +54,8 @@ def listaNomesCriancas():
         return []
     finally:
         desconectarDb(conexao)
+        
+
 
 # janela de login
 app = ctk.CTk()
@@ -324,7 +335,7 @@ def segundaJanela():
 
         def cadastroPadrinhos():
             # Configurações da janela
-            global dadoscadastroPadrinho, nomeEntryPadrinho, telefoneEntryPadrinho, emailEntryPadrinho, criancaEntryPadrinho, enderecoEntryPadrinho
+            global dadoscadastroPadrinho, nomeEntryPadrinho, telefoneEntryPadrinho, emailEntryPadrinho, criancaEntryPadrinho, enderecoEntryPadrinho, apadrinhadaComboboxPadrinho
             dadoscadastroPadrinho = ctk.CTk()
             dadoscadastroPadrinho.title("Padrinhos")
             dadoscadastroPadrinho.geometry("600x400")

@@ -8,7 +8,7 @@ def conectarDb():
     # Essa try é como se eu falo tenta fazer isso (no caso o que está dentro do bloco que é a conexão com o banco)
     try:
         conexao = mysql.connector.connect(
-            host='192.168.1.14',        
+            host='localhost',        
             database="esperanca",
             user="dev",
             password="Esperanca@2024"
@@ -25,11 +25,6 @@ def desconectarDb(conexao):
     if conexao.is_connected():
         conexao.close()
         print("Desconectado com sucesso!")
-
-# Verifica a conexão, não vamos ficar 
-# usando assim isso é só pra ver no terminal que está funcionando.
-#con = conectarDb()
-#desc = desconectarDb(con)
 
 # Criando as tabelas
 def criarTabelas(conexao):
@@ -77,21 +72,42 @@ def criarTabelas(conexao):
     except Error as e:
         print(f"Erro ao criar as tabelas: {e}")
         
+# Para criar as tabelas no workbench 
+#conexao = conectarDb()
+#if conexao.is_connected():
+#    criarTabelas(conexao)
+#    desconectarDb(conexao)
+    
 # Adicionar crianças no banco de dados
-def adicionarCriancas(conexao, nome, idade, responsavel, endereco, contato, genero):
+def adicionarCriancas(conexao, nome, responsavel, endereco, contato, idade, genero):
     try:
         cursor = conexao.cursor()
-        comandoSql = """ INSERT INTO criancas (nome, idade, responsavel, endereco, contato, genero)
+        comandoSql = """ INSERT INTO criancas (nome, responsavel, endereco, contato, idade, genero)
                         VALUES (%s, %s, %s, %s, %s, %s)"""
-        valores = (nome, responsavel, idade, endereco, contato, genero)
+        valores = (nome, responsavel, endereco, contato, idade, genero)
         cursor.execute(comandoSql, valores)
         conexao.commit()
         print(f"Criança: {nome} adicionada com sucesso!")
         cursor.close()
     except Error as e:
         print(f"Erro ao adicionar a criança: {e}")
+        
+# Associar criança ao Padrinho por nome
+def obterCriancaPorNome(conexao, criancaApadrinhada):
+    cursor = conexao.cursor()
+    comandoSql = "SELECT id FROM criancas WHERE nome = %s"
+    cursor.execute(comandoSql, (criancaApadrinhada,))
+    resultado = cursor.fetchone()
+    cursor.close()
+    
+    if resultado:
+        return resultado[0]
+    else:
+        return None
 
-def adicionarPadrinhos(conexao, nome, telefone, email, endereco ):
+    
+# Adicionar padrinhos no banco de dados
+def adicionarPadrinhos(conexao, nome, telefone, email, endereco, idCriancaSelcionada ):
     try:
         cursor = conexao.cursor()
         comandosql = """ INSERT INTO padrinhos (nome, telefone, email, endereco )
@@ -99,7 +115,47 @@ def adicionarPadrinhos(conexao, nome, telefone, email, endereco ):
         valores = (nome, telefone, email, endereco)
         cursor.execute(comandosql, valores)
         conexao.commit()
+        id_padrinho = cursor.lastrowid
+        
+        if idCriancaSelcionada:
+            adicionarCriancaPadrinhos(conexao, idCriancaSelcionada, id_padrinho)
+            
         print(f"Padrinho: {nome} adicionada com sucesso!")
         cursor.close()
     except Error as e:
         print(f"Erro ao adicionar o Padrinho: {e}")
+        
+# Adicionar na tabela criança e padrinho no banco de dados
+def adicionarCriancaPadrinhos(conexao, id_crianca, id_padrinho):
+    try:
+        cursor = conexao.cursor()
+        comandoSql = """ INSERT INTO criancas_padrinhos (id_crianca, id_padrinho)
+                        VALUES (%s, %s)"""
+        valores = (id_crianca, id_padrinho)
+        cursor.execute(comandoSql, valores)
+        conexao.commit()
+        print(f"Criança com o id {id_crianca} associada ao Padrinho com o id {id_padrinho}")
+        cursor.close()
+    except Error as e:
+        print(f"Erro ao associar a criança ao Padrinho! {e}")
+        
+# Se precisar fazer alterações ou adicionar tabelas, colunas, campos ...
+# Com essa função dá para alterar pelo proprio python, ao invés de usar o workbench 
+# Apenas adicionando na variável comandoSql os comando SQL que vc quer 
+# Tire a parte de baixo os "#" e é para ser execuado as alteraçções. 
+# Faça isso ma sua branch por favor, não se esqueça.
+
+def fazerAlteracoesNoBanco(conexao, comandoAql):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute(comandoAql)
+        conexao.commit()
+        print("Alteração adicionada com sucesso")
+        cursor.close()
+    except Error as e:
+        print(f"Erro ao alterar: {e}")
+
+#conexao = conectarDb()
+#if conexao.is_connected:
+#    comandoSql = "Coloque a sua alteração aqui!"
+#    fazerAlteraçõesNoBanco(conexao, comandoSql)
