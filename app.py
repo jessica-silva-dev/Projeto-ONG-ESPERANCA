@@ -5,6 +5,22 @@ from PIL import Image
 from db import *
 
 # Funcionalidades dos botôes
+# Função para limpar os campos de cadastro criança 
+def limpaCamposCrianca():
+    nomeEntryCrianca.delete(0, ctk.END)
+    responsavelEntryCrianca.delete(0, ctk.END)
+    idadeComboboxCrianca.set('')
+    enderecoEntryCrianca.delete(0, ctk.END)
+    telefoneEntryCrianca.delete(0, ctk.END)
+
+# Função para limpar os campos de cadastro padrinhos 
+def limpaCamposPadrinho():
+    nomeEntryPadrinho.delete(0, ctk.END)
+    telefoneEntryPadrinho.delete(0, ctk.END)
+    emailEntryPadrinho.delete(0, ctk.END)
+    enderecoEntryPadrinho.delete(0, ctk.END)
+    apadrinhadaComboboxPadrinho.set('')
+
 # Botão Salvar da janela cadastro criança
 def salvarCriancas():
     nome = nomeEntryCrianca.get()
@@ -12,11 +28,13 @@ def salvarCriancas():
     idade = idadeComboboxCrianca.get()
     endereco = enderecoEntryCrianca.get()
     contato = telefoneEntryCrianca.get()
-    genero = genero.get() 
+    genero = generoVar.get() 
     
     conexao = conectarDb()
     if conexao is not None:
         adicionarCriancas(conexao, nome, responsavel, endereco, contato, idade, genero)
+        # Paea limpar os campos após salvar os dados
+        limpaCamposCrianca()
         desconectarDb(conexao)
         
 # Botão Salvar da janela cadastro padrinho
@@ -32,6 +50,8 @@ def salvarPadrinhos():
         try: 
             idCriancaSelcionada = obterCriancaPorNome(conexao, criancaApadrinhada)
             adicionarPadrinhos(conexao, nome, contato, email, endereco, idCriancaSelcionada)
+            # Paea limpar os campos após salvar os dados
+            limpaCamposPadrinho()
         except Exception as e:
             print(f"Erro ao salvar padrinho: {e}")
         finally:    
@@ -272,7 +292,7 @@ def segundaJanela():
     # Jamela de cadastro de mais crianças, ao clicar no botão cadastrar vai abrir essa tela
     def janelaCadastro():
         # Configurações da janela
-        global cadastroCrianca, nomeEntryCrianca, responsavelEntryCrianca, idadeComboboxCrianca, enderecoEntryCrianca, telefoneEntryCrianca, masculinoVar, femininoVar
+        global cadastroCrianca, nomeEntryCrianca, responsavelEntryCrianca, idadeComboboxCrianca, enderecoEntryCrianca, telefoneEntryCrianca, generoVar
         cadastroCrianca = ctk.CTk()
         cadastroCrianca.title("Cadastro das crianças")
         cadastroCrianca.geometry("600x400")
