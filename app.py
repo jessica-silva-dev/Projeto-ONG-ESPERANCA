@@ -82,39 +82,40 @@ def exibirDadosCriancas():
     if conexao is not None:
         try:
             cursor = conexao.cursor()
-            cursor.execute("SELECT nome, idade, responsavel, endereco, contato, genero FROM criancas")
+            cursor.execute("SELECT nome, idade, responsavel, endereco, contato, genero FROM criancas ORDER BY nome ASC")
             dados = cursor.fetchall() 
             
             # Criando o treeview para mostrar os dados
-            tabela = ttk.Treeview(dadosCriancas, columns=('Nome', 'Idade', 'Responsável', 'Endereço', 'Contato', 'Gênero'), show='headings')
-            tabela.heading('Nome', text='Nome')
-            tabela.heading('Idade', text='Idade')
-            tabela.heading('Responsável', text='Responsável')
-            tabela.heading('Endereço', text='Endereço')
-            tabela.heading('Contato', text='Contato')
-            tabela.heading('Gênero', text='Gênero')
+            global tabelaCriancas
+            tabelaCriancas = ttk.Treeview(dadosCriancas, columns=('Nome', 'Idade', 'Responsável', 'Endereço', 'Contato', 'Gênero'), show='headings')
+            tabelaCriancas.heading('Nome', text='Nome')
+            tabelaCriancas.heading('Idade', text='Idade')
+            tabelaCriancas.heading('Responsável', text='Responsável')
+            tabelaCriancas.heading('Endereço', text='Endereço')
+            tabelaCriancas.heading('Contato', text='Contato')
+            tabelaCriancas.heading('Gênero', text='Gênero')
 
             # Definir a largura das colunas
-            tabela.column('Nome', width=100)
-            tabela.column('Idade', width=65)
-            tabela.column('Responsável', width=100)
-            tabela.column('Endereço', width=150)
-            tabela.column('Contato', width=100)
-            tabela.column('Gênero', width=65)
+            tabelaCriancas.column('Nome', width=100)
+            tabelaCriancas.column('Idade', width=65)
+            tabelaCriancas.column('Responsável', width=100)
+            tabelaCriancas.column('Endereço', width=150)
+            tabelaCriancas.column('Contato', width=100)
+            tabelaCriancas.column('Gênero', width=65)
 
-            tabela.place(relx=0.10, rely=0.4, relwidth=0.86, relheight=0.50)
+            tabelaCriancas.place(relx=0.10, rely=0.4, relwidth=0.86, relheight=0.50)
 
 
             # Criando a barra de rolagem
-            barraRolar = ttk.Scrollbar(dadosCriancas, orient="vertical", command=tabela.yview)
+            barraRolar = ttk.Scrollbar(dadosCriancas, orient="vertical", command=tabelaCriancas.yview)
 
             # Definindo que a barra pertence à tabela
-            tabela.configure(yscrollcommand=barraRolar.set)
+            tabelaCriancas.configure(yscrollcommand=barraRolar.set)
             barraRolar.place(relx=0.96, rely=0.4, relwidth=0.03, relheight=0.50)
 
             # Inserir os dados nas colunas
             for linha in dados:
-                tabela.insert('', 'end', values=linha)
+                tabelaCriancas.insert('', 'end', values=linha)
                 
             cursor.close()
         except Exception as e:
@@ -128,41 +129,77 @@ def exibirDadosPadrinhos():
     if conexao is not None:
         try:
             cursor = conexao.cursor()
-            cursor.execute("SELECT nome, telefone, email, endereco FROM padrinhos")
+            cursor.execute("SELECT nome, telefone, email, endereco FROM padrinhos ORDER BY nome ASC")
             dados = cursor.fetchall()
             
             # Criando o Treeview
-            tabela = ttk.Treeview(dadosPadrinhos, columns=('Nome', 'Telefone', 'Email', 'Endereço'), show='headings')
-            tabela.heading('Nome', text='Nome')
-            tabela.heading('Telefone', text='Telefone')
-            tabela.heading('Email', text='Email')
-            tabela.heading('Endereço', text='Endereço')
+            global tabelaPadrinhos
+            tabelaPadrinhos = ttk.Treeview(dadosPadrinhos, columns=('Nome', 'Telefone', 'Email', 'Endereço'), show='headings')
+            tabelaPadrinhos.heading('Nome', text='Nome')
+            tabelaPadrinhos.heading('Telefone', text='Telefone')
+            tabelaPadrinhos.heading('Email', text='Email')
+            tabelaPadrinhos.heading('Endereço', text='Endereço')
         
             # Definir a largura das colunas
-            tabela.column('Nome', width=100)
-            tabela.column('Telefone', width=65)
-            tabela.column('Email', width=100)
-            tabela.column('Endereço', width=150)
+            tabelaPadrinhos.column('Nome', width=100)
+            tabelaPadrinhos.column('Telefone', width=65)
+            tabelaPadrinhos.column('Email', width=100)
+            tabelaPadrinhos.column('Endereço', width=150)
 
-            tabela.place(relx=0.10, rely=0.4, relwidth=0.86, relheight=0.50)
+            tabelaPadrinhos.place(relx=0.10, rely=0.4, relwidth=0.86, relheight=0.50)
 
             # Criando a barra de rolagem
-            barraRolar = ttk.Scrollbar(dadosPadrinhos, orient="vertical", command=tabela.yview)
+            barraRolar = ttk.Scrollbar(dadosPadrinhos, orient="vertical", command=tabelaPadrinhos.yview)
 
             # Definindo que a barra pertence à tabela
-            tabela.configure(yscrollcommand=barraRolar.set)
+            tabelaPadrinhos.configure(yscrollcommand=barraRolar.set)
             barraRolar.place(relx=0.96, rely=0.4, relwidth=0.03, relheight=0.50)
 
             # Inserindo dados no Treeview
             for linha in dados:
-                tabela.insert('', 'end', values=linha)
+                tabelaPadrinhos.insert('', 'end', values=linha)
  
             cursor.close()
         except Exception as e:
             print(f"Erro ao exibir dados dos padrinhos: {e}")
         finally:
             desconectarDb(conexao)
-
+# Botão atulizar tabela das crianças
+def atualizarDadosCrianca():
+    # limpa a tabela para depois atualizar com novos dados
+    tabelaCriancas.delete(*tabelaCriancas.get_children())
+    
+    conexao = conectarDb()
+    if conexao is not None:
+        try:
+            cursor = conexao.cursor()
+            cursor.execute("SELECT nome, idade, responsavel, endereco, contato, genero FROM criancas ORDER BY nome ASC")
+            dados = cursor.fetchall()
+            
+            for linha in dados:
+                tabelaCriancas.insert("", ctk.END, values=linha)
+        except Exception as e:
+            print(f"Erro ao carregar as crianças: {e}")
+        finally:
+            desconectarDb(conexao)
+        
+def atualizarDadosPadrinhos():
+    tabelaPadrinhos.delete(*tabelaPadrinhos.get_children())
+    conexao = conectarDb()
+    if conexao is not None:
+        try:
+            cursor = conexao.cursor()
+            cursor.execute("SELECT nome, telefone, email, endereco FROM padrinhos ORDER BY nome ASC")
+            dados = cursor.fetchall()
+            
+            for linha in dados:
+                tabelaPadrinhos.insert('', ctk.END, values=linha)
+        except Exception as e:
+            print(f"Erro ao carregar crianças: {e}")
+        finally:
+            desconectarDb(conexao)
+        
+              
 # janela de login
 app = ctk.CTk()
 
@@ -281,7 +318,7 @@ def segundaJanela():
     botaoEditar.place(x=405, y=660)
    
     # Botão atualizar crianças
-    botaoAtualizar = ctk.CTkButton(dadosCriancas, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+    botaoAtualizar = ctk.CTkButton(dadosCriancas, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command= atualizarDadosCrianca)
     botaoAtualizar.place(x=485, y=660)
     
     # Botão Cadastrar crianças
@@ -432,7 +469,7 @@ def segundaJanela():
         botaoEditar.place(x=405, y=660)
     
         # Botão atualizar padrinhos
-        botaoAtualizar = ctk.CTkButton(dadosPadrinhos, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+        botaoAtualizar = ctk.CTkButton(dadosPadrinhos, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=atualizarDadosPadrinhos)
         botaoAtualizar.place(x=485, y=660)
         
         # Botão Cadastrar padrinhos
