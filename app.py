@@ -1,8 +1,11 @@
 import tkinter as tk
+from tkinter import ttk
 import customtkinter as ctk
 from PIL import Image
 from db import *
 
+# Funcionalidades dos botôes
+# Botão Salvar da janela cadastro criança
 def salvarCriancas():
     nome = nomeEntryCrianca.get()
     responsavel = responsavelEntryCrianca.get()
@@ -11,23 +14,20 @@ def salvarCriancas():
     contato = telefoneEntryCrianca.get()
     genero = genero.get() 
     
-    
     conexao = conectarDb()
     if conexao is not None:
         adicionarCriancas(conexao, nome, responsavel, endereco, contato, idade, genero)
         desconectarDb(conexao)
         
+# Botão Salvar da janela cadastro padrinho
 def salvarPadrinhos():
-    
     nome = nomeEntryPadrinho.get()
     contato = telefoneEntryPadrinho.get()
     email = emailEntryPadrinho.get()
     endereco = enderecoEntryPadrinho.get()
     criancaApadrinhada = apadrinhadaComboboxPadrinho.get()
-    
-    
+
     conexao = conectarDb()
-    
     if conexao is not None:
         try: 
             idCriancaSelcionada = obterCriancaPorNome(conexao, criancaApadrinhada)
@@ -36,7 +36,8 @@ def salvarPadrinhos():
             print(f"Erro ao salvar padrinho: {e}")
         finally:    
             desconectarDb(conexao)
-
+            
+# Para pegar o id da criança atraves do nome que foi colocado na combobox
 def listaNomesCriancas():
     conexao = conectarDb()
     if conexao is None:
@@ -54,8 +55,93 @@ def listaNomesCriancas():
         return []
     finally:
         desconectarDb(conexao)
-        
 
+# Cria uma tabela com treview e pega todos os dados da tabela crianças
+def exibirDadosCriancas():
+    conexao = conectarDb()
+    if conexao is not None:
+        try:
+            cursor = conexao.cursor()
+            cursor.execute("SELECT nome, idade, responsavel, endereco, contato, genero FROM criancas")
+            dados = cursor.fetchall() 
+            
+            # Criando o treeview para mostrar os dados
+            tabela = ttk.Treeview(dadosCriancas, columns=('Nome', 'Idade', 'Responsável', 'Endereço', 'Contato', 'Gênero'), show='headings')
+            tabela.heading('Nome', text='Nome')
+            tabela.heading('Idade', text='Idade')
+            tabela.heading('Responsável', text='Responsável')
+            tabela.heading('Endereço', text='Endereço')
+            tabela.heading('Contato', text='Contato')
+            tabela.heading('Gênero', text='Gênero')
+
+            # Definir a largura das colunas
+            tabela.column('Nome', width=100)
+            tabela.column('Idade', width=65)
+            tabela.column('Responsável', width=100)
+            tabela.column('Endereço', width=150)
+            tabela.column('Contato', width=100)
+            tabela.column('Gênero', width=65)
+
+            tabela.place(relx=0.10, rely=0.4, relwidth=0.86, relheight=0.50)
+
+
+            # Criando a barra de rolagem
+            barraRolar = ttk.Scrollbar(dadosCriancas, orient="vertical", command=tabela.yview)
+
+            # Definindo que a barra pertence à tabela
+            tabela.configure(yscrollcommand=barraRolar.set)
+            barraRolar.place(relx=0.96, rely=0.4, relwidth=0.03, relheight=0.50)
+
+            # Inserir os dados nas colunas
+            for linha in dados:
+                tabela.insert('', 'end', values=linha)
+                
+            cursor.close()
+        except Exception as e:
+            print(f"Erro ao exibir os dados das crianças: {e}")
+        finally:
+            desconectarDb(conexao)
+
+# Cria uma tabela com treview e pega todos os dados da tabela padrinhos
+def exibirDadosPadrinhos():
+    conexao = conectarDb()
+    if conexao is not None:
+        try:
+            cursor = conexao.cursor()
+            cursor.execute("SELECT nome, telefone, email, endereco FROM padrinhos")
+            dados = cursor.fetchall()
+            
+            # Criando o Treeview
+            tabela = ttk.Treeview(dadosPadrinhos, columns=('Nome', 'Telefone', 'Email', 'Endereço'), show='headings')
+            tabela.heading('Nome', text='Nome')
+            tabela.heading('Telefone', text='Telefone')
+            tabela.heading('Email', text='Email')
+            tabela.heading('Endereço', text='Endereço')
+        
+            # Definir a largura das colunas
+            tabela.column('Nome', width=100)
+            tabela.column('Telefone', width=65)
+            tabela.column('Email', width=100)
+            tabela.column('Endereço', width=150)
+
+            tabela.place(relx=0.10, rely=0.4, relwidth=0.86, relheight=0.50)
+
+            # Criando a barra de rolagem
+            barraRolar = ttk.Scrollbar(dadosPadrinhos, orient="vertical", command=tabela.yview)
+
+            # Definindo que a barra pertence à tabela
+            tabela.configure(yscrollcommand=barraRolar.set)
+            barraRolar.place(relx=0.96, rely=0.4, relwidth=0.03, relheight=0.50)
+
+            # Inserindo dados no Treeview
+            for linha in dados:
+                tabela.insert('', 'end', values=linha)
+ 
+            cursor.close()
+        except Exception as e:
+            print(f"Erro ao exibir dados dos padrinhos: {e}")
+        finally:
+            desconectarDb(conexao)
 
 # janela de login
 app = ctk.CTk()
@@ -113,7 +199,8 @@ def segundaJanela():
     dadosCriancas.geometry("900x700")
     dadosCriancas.resizable(False, False)
     ctk.set_appearance_mode("light")
-   
+    exibirDadosCriancas()
+    
     # Função para criar o gradiente laranja para branco
     def criarGradiente(canvas, width, height, iniciarCor, fimCor):
         r1, g1, b1 = canvas.winfo_rgb(iniciarCor) 
@@ -238,7 +325,6 @@ def segundaJanela():
         # Opção Feminino
         femininoRadio = ctk.CTkRadioButton(cadastroCrianca, text="Feminino", variable=generoVar, value="Feminino", font=("Georgia", 12))
         femininoRadio.place(x=325, y=320)
-
        
         # Contato cadastro criança 
         telefoneLabelCrianca = ctk.CTkLabel(cadastroCrianca, text="Contato: ", font=("Georgia", 12))
@@ -279,6 +365,7 @@ def segundaJanela():
         dadosPadrinhos.geometry("900x700")
         dadosPadrinhos.resizable(False, False)
         ctk.set_appearance_mode("light")
+        exibirDadosPadrinhos()
         
         # Frame menu lateral padrinhos
         menuFrame = ctk.CTkFrame(dadosPadrinhos, width=80, height=900, corner_radius=0)
