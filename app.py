@@ -198,7 +198,6 @@ def atualizarDadosPadrinhos():
             print(f"Erro ao carregar crianças: {e}")
         finally:
             desconectarDb(conexao)
-        
               
 # janela de login
 app = ctk.CTk()
@@ -212,7 +211,7 @@ ctk.set_appearance_mode("light")
 # Logo
 logo = ctk.CTkImage(Image.open("logo.png"), size=(500, 350))
 logo_label = ctk.CTkLabel(app, image=logo, text="")  
-logo_label.place(x=150, y=20)  
+logo_label.place(x=150, y=20) 
 
 # Nome
 nomeLabel = ctk.CTkLabel(app, text="Usuário:", font=("Georgia", 16))
@@ -303,27 +302,27 @@ def segundaJanela():
     
     # Entry Buscar crianças
     nomeEntryCrianca = ctk.CTkEntry(dadosCriancas, placeholder_text="Inserir o nome", font=("Georgia", 12), width=200)
-    nomeEntryCrianca.place(x=317, y=215)
+    nomeEntryCrianca.place(x=315, y=215)
    
     # Botão buscar crianças
     botaoBuscar = ctk.CTkButton(dadosCriancas, text="Buscar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoBuscar.place(x=533, y=215)
+    botaoBuscar.place(x=538, y=215)
     
     # Botão excluir crianças
     botaoExcluir = ctk.CTkButton(dadosCriancas, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoExcluir.place(x=565, y=660)
+    botaoExcluir.place(x=477, y=660)
    
     # Botão Editar crianças
     botaoEditar = ctk.CTkButton(dadosCriancas, text="Editar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoEditar.place(x=405, y=660)
+    botaoEditar.place(x=398, y=660)
    
     # Botão atualizar crianças
     botaoAtualizar = ctk.CTkButton(dadosCriancas, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command= atualizarDadosCrianca)
-    botaoAtualizar.place(x=485, y=660)
+    botaoAtualizar.place(x=555, y=660)
     
     # Botão Cadastrar crianças
     botaoCadastro = ctk.CTkButton(dadosCriancas, text="Cadastrar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoCadastro.place(x=315, y=660)
+    botaoCadastro.place(x=310, y=660)
     botaoCadastro.bind("<Button-1>", lambda e: janelaCadastro())
     
     # Jamela de cadastro de mais crianças, ao clicar no botão cadastrar vai abrir essa tela
