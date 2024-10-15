@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import customtkinter as ctk
 from PIL import Image
 from db import *
@@ -182,7 +183,8 @@ def atualizarDadosCrianca():
             print(f"Erro ao carregar as crianças: {e}")
         finally:
             desconectarDb(conexao)
-        
+
+# Botão atulizar tabela das padrinhos
 def atualizarDadosPadrinhos():
     tabelaPadrinhos.delete(*tabelaPadrinhos.get_children())
     conexao = conectarDb()
@@ -198,7 +200,62 @@ def atualizarDadosPadrinhos():
             print(f"Erro ao carregar crianças: {e}")
         finally:
             desconectarDb(conexao)
-              
+
+# Botão excluir nome da tabela das crianças
+def excluirCrianca():
+    # Verifica se tem criança seçecionada na tabela
+    criancaSelecionada = tabelaCriancas.selection()
+    if not criancaSelecionada:
+        print("Nenhuma criança selecionada.")
+        return
+    
+    # Faz uma iteração ate chegar na criança desejada e pega os valores dessa criança
+    for item in criancaSelecionada:
+        valores = tabelaCriancas.item(item, 'values')
+        nomeCrianca = valores[0]
+    
+    # Aviso se realmente quer excluir 
+    Aviso = messagebox.askyesno("Confirmar", f"Tem certeza que deseja excluir {nomeCrianca}")
+    
+    # Conexão com o bd e deleta o nome selecionado do bd
+    if Aviso:
+        try:
+            conexao = conectarDb()
+            cursor = conexao.cursor()
+            cursor.execute("DELETE FROM criancas WHERE nome = %s", (nomeCrianca,))
+            conexao.commit()
+            
+            # Tá excluindo da tabela que visualizamos na interface
+            tabelaCriancas.delete(criancaSelecionada)
+        except Exception as e:
+            print(f"Erro ao excluir {nomeCrianca}, {e}")
+        finally:
+            desconectarDb(conexao)
+
+# Botão excluir nome da tabela das padrinhos
+def excluirPadrinho():
+    padrinhoSelecionado = tabelaPadrinhos.selection()
+    if not padrinhoSelecionado:
+        print("Nenhum padrinho selecionado!")
+        return
+    for item in padrinhoSelecionado:
+        valores = tabelaPadrinhos.item(item, 'values')
+        nomePadrinho = valores[0]
+    
+    aviso = messagebox.askyesno("Confirmar", f"Tem certeza que deseja excluir {nomePadrinho}")
+    
+    try:
+        conexao = conectarDb()
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM padrinhos WHERE nome = %s", (nomePadrinho,))
+        conexao.commit()
+        tabelaPadrinhos.delete(padrinhoSelecionado)
+    except Exception as e:
+            print(f"Erro ao excluir {nomePadrinho}, {e}")
+    finally:
+        desconectarDb(conexao)
+    
+
 # janela de login
 app = ctk.CTk()
 
@@ -309,7 +366,7 @@ def segundaJanela():
     botaoBuscar.place(x=538, y=215)
     
     # Botão excluir crianças
-    botaoExcluir = ctk.CTkButton(dadosCriancas, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+    botaoExcluir = ctk.CTkButton(dadosCriancas, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=excluirCrianca)
     botaoExcluir.place(x=477, y=660)
    
     # Botão Editar crianças
@@ -460,7 +517,7 @@ def segundaJanela():
         botaoBuscar.place(x=533, y=215)
         
         # Botão excluir padrinhos
-        botaoExcluir = ctk.CTkButton(dadosPadrinhos, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+        botaoExcluir = ctk.CTkButton(dadosPadrinhos, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=excluirPadrinho)
         botaoExcluir.place(x=565, y=660)
     
         # Botão Editar padrinhos
