@@ -4,7 +4,7 @@ import customtkinter as ctk
 from PIL import Image
 from db import *
 
-# Funcionalidades dos botôes
+# Funcionalidades dos botôes projeto esperenca
 # Função para limpar os campos de cadastro criança 
 def limpaCamposCrianca():
     nomeEntryCrianca.delete(0, ctk.END)
