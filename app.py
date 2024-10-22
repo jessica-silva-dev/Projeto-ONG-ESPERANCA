@@ -229,8 +229,7 @@ def excluirCrianca():
     # Verifica se tem criança seçecionada na tabela
     criancaSelecionada = tabelaCriancas.selection()
     if not criancaSelecionada:
-        print("Nenhuma criança selecionada.")
-        return
+       messagebox.showinfo("Atenção", f"Nenhuma criança selecionada.")
     
     # Faz uma iteração ate chegar na criança desejada e pega os valores dessa criança
     for item in criancaSelecionada:
@@ -259,8 +258,7 @@ def excluirCrianca():
 def excluirPadrinho():
     padrinhoSelecionado = tabelaPadrinhos.selection()
     if not padrinhoSelecionado:
-        print("Nenhum padrinho selecionado!")
-        return
+        messagebox.showinfo("Atenção", f"Nenhum padrinho selecionado.")
     for item in padrinhoSelecionado:
         valores = tabelaPadrinhos.item(item, 'values')
         nomePadrinho = valores[0]
@@ -417,11 +415,11 @@ def segundaJanela():
     criarGradiente(canvas, 80, 900, "#FFA500", "#FFE5B4")
     
     # Canvas gradiente parte superior crianças
-    canvasSuperior = tk.Canvas(dadosCriancas, width=1200, height=190, highlightthickness=0)
+    canvasSuperior = tk.Canvas(dadosCriancas, width=1200, height=150, highlightthickness=0)
     canvasSuperior.place(x=0, y=0)
     
     # Gradiente parte superior crianças
-    criarGradiente(canvasSuperior, 1200, 190, "#FFE5B4", "#FFA500")
+    criarGradiente(canvasSuperior, 1200, 150, "#FFE5B4", "#FFA500")
     
     # Imagem das crianças na parte cima crianças
     imagemCrianca = ctk.CTkImage(Image.open("criancas.png"), size=(880, 130))
@@ -569,11 +567,11 @@ def segundaJanela():
         criarGradiente(canvas, 80, 900, "#FFA500", "#FFE5B4")
         
         # Canvas gradiente parte superior padrinhos
-        canvasSuperior = tk.Canvas(dadosPadrinhos, width=1200, height=190, highlightthickness=0)
+        canvasSuperior = tk.Canvas(dadosPadrinhos, width=1200, height=150, highlightthickness=0)
         canvasSuperior.place(x=0, y=0)
         
         # Gradiente parte superior padrinhos
-        criarGradiente(canvasSuperior, 1200, 190, "#FFE5B4", "#FFA500")
+        criarGradiente(canvasSuperior, 1200, 150, "#FFE5B4", "#FFA500")
         
         # Imagem dos padrinhos na parte cima 
         imagemPadrinho = ctk.CTkImage(Image.open("padrinhos.png"), size=(880, 130))
