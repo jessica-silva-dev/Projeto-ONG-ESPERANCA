@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 import customtkinter as ctk
 from PIL import Image
 from db import *
@@ -40,22 +41,45 @@ def salvarCriancas():
 # Botão Salvar da janela cadastro padrinho
 def salvarPadrinhos():
     nome = nomeEntryPadrinho.get()
-    contato = telefoneEntryPadrinho.get()
+    telefone = telefoneEntryPadrinho.get()
     email = emailEntryPadrinho.get()
     endereco = enderecoEntryPadrinho.get()
     criancaApadrinhada = apadrinhadaComboboxPadrinho.get()
 
+    padrinhoSelecionado = tabelaPadrinhos.selection()
+    
     conexao = conectarDb()
-    if conexao is not None:
-        try: 
-            idCriancaSelcionada = obterCriancaPorNome(conexao, criancaApadrinhada)
-            adicionarPadrinhos(conexao, nome, contato, email, endereco, idCriancaSelcionada)
-            # Paea limpar os campos após salvar os dados
-            limpaCamposPadrinho()
-        except Exception as e:
-            print(f"Erro ao salvar padrinho: {e}")
-        finally:    
-            desconectarDb(conexao)
+    if conexao is None:
+        print("Erro na conexão com o banco de dados")
+        return
+    
+    try:
+        idCriancaSelecionada = obterCriancaPorNome(conexao, criancaApadrinhada)
+        if padrinhoSelecionado:
+            for item in padrinhoSelecionado:
+                valores = tabelaPadrinhos.item(item, 'values')
+                nomeAntigo = valores[0]
+                
+                cursor = conexao.cursor()
+                cursor.execute("""
+                    UPDATE padrinhos SET nome = %s, telefone = %s, email = %s, endereco = %s
+                    WHERE nome = %s
+                """, (nome, telefone, email, endereco, idCriancaSelecionada, nomeAntigo))
+                conexao.commit()
+                print(f"{nome} foi atualizado com sucesso.")
+            tabelaPadrinhos.delete(padrinhoSelecionado) 
+            tabelaPadrinhos.insert("", "end", values=(nome, telefone, email, endereco, criancaApadrinhada)) 
+        else:
+            adicionarPadrinhos(conexao, nome, telefone, email, endereco, idCriancaSelecionada)
+            print(f"{nome} foi adicionado com sucesso.")
+        
+        limpaCamposPadrinho()
+        
+    except Exception as e:
+        print(f"Erro ao salvar padrinho: {e}")
+    finally:
+        desconectarDb(conexao)
+
             
 # Para pegar o id da criança atraves do nome que foi colocado na combobox
 def listaNomesCriancas():
@@ -182,7 +206,8 @@ def atualizarDadosCrianca():
             print(f"Erro ao carregar as crianças: {e}")
         finally:
             desconectarDb(conexao)
-        
+
+# Botão atulizar tabela das padrinhos
 def atualizarDadosPadrinhos():
     tabelaPadrinhos.delete(*tabelaPadrinhos.get_children())
     conexao = conectarDb()
@@ -198,8 +223,114 @@ def atualizarDadosPadrinhos():
             print(f"Erro ao carregar crianças: {e}")
         finally:
             desconectarDb(conexao)
+
+# Botão excluir nome da tabela das crianças
+def excluirCrianca():
+    # Verifica se tem criança seçecionada na tabela
+    criancaSelecionada = tabelaCriancas.selection()
+    if not criancaSelecionada:
+        print("Nenhuma criança selecionada.")
+        return
+    
+    # Faz uma iteração ate chegar na criança desejada e pega os valores dessa criança
+    for item in criancaSelecionada:
+        valores = tabelaCriancas.item(item, 'values')
+        nomeCrianca = valores[0]
+    
+    # Aviso se realmente quer excluir 
+    Aviso = messagebox.askyesno("Confirmar", f"Tem certeza que deseja excluir {nomeCrianca}")
+    
+    # Conexão com o bd e deleta o nome selecionado do bd
+    if Aviso:
+        try:
+            conexao = conectarDb()
+            cursor = conexao.cursor()
+            cursor.execute("DELETE FROM criancas WHERE nome = %s", (nomeCrianca,))
+            conexao.commit()
+            
+            # Tá excluindo da tabela que visualizamos na interface
+            tabelaCriancas.delete(criancaSelecionada)
+        except Exception as e:
+            print(f"Erro ao excluir {nomeCrianca}, {e}")
+        finally:
+            desconectarDb(conexao)
+
+# Botão excluir nome da tabela das padrinhos
+def excluirPadrinho():
+    padrinhoSelecionado = tabelaPadrinhos.selection()
+    if not padrinhoSelecionado:
+        print("Nenhum padrinho selecionado!")
+        return
+    for item in padrinhoSelecionado:
+        valores = tabelaPadrinhos.item(item, 'values')
+        nomePadrinho = valores[0]
+    
+    aviso = messagebox.askyesno("Confirmar", f"Tem certeza que deseja excluir {nomePadrinho}")
+    
+    try:
+        conexao = conectarDb()
+        cursor = conexao.cursor()
+        cursor.execute("DELETE FROM padrinhos WHERE nome = %s", (nomePadrinho,))
+        conexao.commit()
+        tabelaPadrinhos.delete(padrinhoSelecionado)
+    except Exception as e:
+            print(f"Erro ao excluir {nomePadrinho}, {e}")
+    finally:
+        desconectarDb(conexao)
         
-              
+def buscarCrianca():
+    busca = nomeEntryCrianca.get()
+    
+    conexao = conectarDb()
+    if conexao is None:
+        print("Erro na conexão com o banco de dados")
+        return
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT nome, idade, responsavel, endereco, contato, genero FROM criancas WHERE nome LIKE %s", ('%' + busca + '%',))
+        resultados = cursor.fetchall()
+        
+        for item in tabelaCriancas.get_children():
+            tabelaCriancas.delete(item)
+            
+        if not resultados:
+            messagebox.showinfo("Busca", f"Nenhuma criança encontrada com o nome '{busca}'.")
+        else:
+            for row in resultados:
+                tabelaCriancas.insert("", "end", values=row)
+        
+    except Exception as e:
+        print(f"Erro ao buscar crianças: {e}")
+    finally:
+        desconectarDb(conexao)
+
+def buscarPadrinho():
+    busca = nomeEntryPadrinho.get()
+    
+    conexao = conectarDb()
+    if conexao is None:
+        print("Erro na conexão com o banco de dados")
+        return
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT nome, telefone, email, endereco FROM padrinhos WHERE nome LIKE %s", ('%' + busca + '%',))
+        resultados = cursor.fetchall()
+        
+        # Limpa a tabela antes de preencher com os resultados
+        for item in tabelaPadrinhos.get_children():
+            tabelaPadrinhos.delete(item)
+            
+        if not resultados:
+            messagebox.showinfo("Busca", f"Nenhum padrinho encontrado com o nome '{busca}'.")
+        else:
+            for row in resultados:
+                tabelaPadrinhos.insert("", "end", values=row)
+        
+    except Exception as e:
+        print(f"Erro ao buscar padrinhos: {e}")
+    finally:
+        desconectarDb(conexao)
+
 # janela de login
 app = ctk.CTk()
 
@@ -212,7 +343,7 @@ ctk.set_appearance_mode("light")
 # Logo
 logo = ctk.CTkImage(Image.open("logo.png"), size=(500, 350))
 logo_label = ctk.CTkLabel(app, image=logo, text="")  
-logo_label.place(x=150, y=20)  
+logo_label.place(x=150, y=20) 
 
 # Nome
 nomeLabel = ctk.CTkLabel(app, text="Usuário:", font=("Georgia", 16))
@@ -303,27 +434,28 @@ def segundaJanela():
     
     # Entry Buscar crianças
     nomeEntryCrianca = ctk.CTkEntry(dadosCriancas, placeholder_text="Inserir o nome", font=("Georgia", 12), width=200)
-    nomeEntryCrianca.place(x=317, y=215)
+    nomeEntryCrianca.place(x=315, y=215)
    
     # Botão buscar crianças
-    botaoBuscar = ctk.CTkButton(dadosCriancas, text="Buscar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoBuscar.place(x=533, y=215)
+    botaoBuscar = ctk.CTkButton(dadosCriancas, text="Buscar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=buscarCrianca)
+    botaoBuscar.place(x=538, y=215)
+    dadosCriancas.bind('<Return>', lambda e: buscarCrianca())
     
     # Botão excluir crianças
-    botaoExcluir = ctk.CTkButton(dadosCriancas, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoExcluir.place(x=565, y=660)
+    botaoExcluir = ctk.CTkButton(dadosCriancas, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=excluirCrianca)
+    botaoExcluir.place(x=477, y=660)
    
     # Botão Editar crianças
     botaoEditar = ctk.CTkButton(dadosCriancas, text="Editar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoEditar.place(x=405, y=660)
+    botaoEditar.place(x=398, y=660)
    
     # Botão atualizar crianças
     botaoAtualizar = ctk.CTkButton(dadosCriancas, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command= atualizarDadosCrianca)
-    botaoAtualizar.place(x=485, y=660)
+    botaoAtualizar.place(x=555, y=660)
     
     # Botão Cadastrar crianças
     botaoCadastro = ctk.CTkButton(dadosCriancas, text="Cadastrar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-    botaoCadastro.place(x=315, y=660)
+    botaoCadastro.place(x=310, y=660)
     botaoCadastro.bind("<Button-1>", lambda e: janelaCadastro())
     
     # Jamela de cadastro de mais crianças, ao clicar no botão cadastrar vai abrir essa tela
@@ -416,7 +548,7 @@ def segundaJanela():
     def terceiraJanela():
         dadosCriancas.withdraw()
         # Configurações da janela
-        global dadosPadrinhos
+        global dadosPadrinhos, nomeEntryPadrinho
         dadosPadrinhos = ctk.CTkToplevel()
         dadosPadrinhos.title("Dados dos Padrinhos")
         dadosPadrinhos.geometry("900x700")
@@ -457,20 +589,21 @@ def segundaJanela():
         nomeEntryPadrinho.place(x=317, y=215)
     
         # Botão buscar padrinhos
-        botaoBuscar = ctk.CTkButton(dadosPadrinhos, text="Buscar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
+        botaoBuscar = ctk.CTkButton(dadosPadrinhos, text="Buscar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=buscarPadrinho)
         botaoBuscar.place(x=533, y=215)
+        dadosPadrinhos.bind('<Return>', lambda e: buscarPadrinho())
         
         # Botão excluir padrinhos
-        botaoExcluir = ctk.CTkButton(dadosPadrinhos, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
-        botaoExcluir.place(x=565, y=660)
-    
+        botaoExcluir = ctk.CTkButton(dadosPadrinhos, text="Excluir", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=excluirPadrinho)
+        botaoExcluir.place(x=485, y=660)        
+        
         # Botão Editar padrinhos
         botaoEditar = ctk.CTkButton(dadosPadrinhos, text="Editar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
         botaoEditar.place(x=405, y=660)
     
         # Botão atualizar padrinhos
         botaoAtualizar = ctk.CTkButton(dadosPadrinhos, text="Atualizar", fg_color="orange", text_color="white", hover_color="darkorange", width=60, command=atualizarDadosPadrinhos)
-        botaoAtualizar.place(x=485, y=660)
+        botaoAtualizar.place(x=565, y=660)
         
         # Botão Cadastrar padrinhos
         botaoCadastro = ctk.CTkButton(dadosPadrinhos, text="Cadastrar", fg_color="orange", text_color="white", hover_color="darkorange", width=60)
@@ -479,14 +612,14 @@ def segundaJanela():
 
         def cadastroPadrinhos():
             # Configurações da janela
-            global dadoscadastroPadrinho, nomeEntryPadrinho, telefoneEntryPadrinho, emailEntryPadrinho, criancaEntryPadrinho, enderecoEntryPadrinho, apadrinhadaComboboxPadrinho
+            global dadoscadastroPadrinho, telefoneEntryPadrinho, emailEntryPadrinho, criancaEntryPadrinho, enderecoEntryPadrinho, apadrinhadaComboboxPadrinho
             dadoscadastroPadrinho = ctk.CTk()
             dadoscadastroPadrinho.title("Padrinhos")
             dadoscadastroPadrinho.geometry("600x400")
             dadoscadastroPadrinho.resizable(False, False)
             ctk.set_appearance_mode("light")
             dadoscadastroPadrinho.grab_set()
-        
+
             # Barra laranja que contem o titulo cdastro das padrinhos
             frameTitulo = ctk.CTkFrame(dadoscadastroPadrinho, width=1200, height=30, bg_color="orange", fg_color="orange", corner_radius=0)
             frameTitulo.place(x=0, y=20)
