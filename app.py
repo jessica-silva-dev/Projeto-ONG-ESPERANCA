@@ -288,6 +288,7 @@ def buscarCrianca():
         cursor.execute("SELECT nome, idade, responsavel, endereco, contato, genero FROM criancas WHERE nome LIKE %s", ('%' + busca + '%',))
         resultados = cursor.fetchall()
         
+        # Limpa a tabela antes de preencher com os resultados
         for item in tabelaCriancas.get_children():
             tabelaCriancas.delete(item)
             
@@ -298,7 +299,7 @@ def buscarCrianca():
                 tabelaCriancas.insert("", "end", values=row)
         
     except Exception as e:
-        print(f"Erro ao buscar crianças: {e}")
+        print(f"Erro ao buscar a criança: {e}")
     finally:
         desconectarDb(conexao)
 
@@ -379,7 +380,7 @@ app.bind('<Return>', verificarLogin)
 def segundaJanela():
     app.destroy()  
     # Configurações da janela
-    global dadosCriancas
+    global dadosCriancas, nomeEntryCrianca
     dadosCriancas = ctk.CTk()
     dadosCriancas.title("Dados das Crianças")
     dadosCriancas.geometry("900x700")
