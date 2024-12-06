@@ -15,6 +15,7 @@ Este projeto foi desenvolvido para auxiliar uma ONG no gerenciamento e cadastro 
 - Python 3
 - CustomTkinter
 - PIL (Python Imaging Library)
+- MySQL
 
 ## Objetivo
 
